@@ -1,0 +1,5 @@
+llm:
+  auth:
+    api_url: https://openai-devoteam.openai.azure.com/
+    api_version: "2024-06-01"
+    model: gpt-4o-mini
