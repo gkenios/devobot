@@ -6,7 +6,8 @@
 
 ---
 
-**Documentation**: <a href="https://sede-x.github.io/AZ_AS_STAM_ADB" target="_blank">https://sede-x.github.io/AZ_AS_STAM_ADB</a>
+**Documentation**: <a href="https://gkenios.github.io/devobot" target="_blank">https://gkenios.github.io/devobot</a>
 
 ---
 
+An agentic bot to access FAQs.

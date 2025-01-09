@@ -28,7 +28,7 @@ runs:
     run: |
       if [ "${{ inputs.requirements-group }}" == "null" ]; then
         uv sync
-      if [ "${{ inputs.requirements-group }}" == "all" ]; then
+      elif [ "${{ inputs.requirements-group }}" == "all" ]; then
         uv sync --all-groups
       else
         uv sync --group ${{ inputs.requirements-group }}
