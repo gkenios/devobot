@@ -10,4 +10,4 @@
 
 ---
 
-An agentic bot to access FAQs.
+An agentic chatbot that can access Devoteam's FAQs.
