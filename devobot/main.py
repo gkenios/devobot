@@ -4,7 +4,11 @@ import json
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langgraph.graph import StateGraph, START, END
 
-from devobot.config import llm, USE_LLM
+from devobot.config import Config, llm
+
+
+ROLE = "lead"  # In: "junior", "senior", "lead"
+QUESTION = f"What is the salary of a Devoteam {ROLE} role with 2 years of experience?"
 
 
 @dataclass
@@ -20,7 +24,7 @@ class State:
 
 
 def node_tool_call(state: State):
-    if USE_LLM:
+    if Config.use_llm:
         new_message = llm.bind_tools([calculate_devoteam_salary]).invoke(state.messages)
     else:
         new_message = Fake(
@@ -30,7 +34,7 @@ def node_tool_call(state: State):
                     {
                         "function": {
                             "name": "calculate_devoteam_salary",
-                            "arguments": '{"role": "junior", "years_of_experience": 2}',
+                            "arguments": f'{{"role": "{ROLE}", "years_of_experience": 2}}',
                         }
                     }
                 ]
@@ -62,7 +66,7 @@ def edge_tool_condition(state: State):
 
 
 def calculate_devoteam_salary(role: str, years_of_experience: int) -> int:
-    """It calculates the salary of a Devoteam employee based on their role and years of experience."""
+    """It calculates the salary of a Devoteam employee"""
     if role == "junior":
         return 30000 + years_of_experience * 1000
     elif role == "senior":
@@ -86,9 +90,7 @@ result = State(
     **builder.compile().invoke(
         State(
             messages=[
-                HumanMessage(
-                    "What is the salary of a Devoteam junior with 2 years of experience?"
-                )
+                HumanMessage(QUESTION),
             ]
         )
     )

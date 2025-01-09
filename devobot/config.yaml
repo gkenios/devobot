@@ -1,5 +1,7 @@
 llm:
   auth:
+    # Set an "API_KEY" environment variable for the key
     api_url: https://openai-devoteam.openai.azure.com/
-    api_version: "2024-06-01"
+    api_version: "2024-10-21"  # https://learn.microsoft.com/en-us/azure/ai-services/openai/api-version-deprecation#latest-ga-api-release
     model: gpt-4o-mini
+  use: false  # false: use predefined responses || true: use an llm
