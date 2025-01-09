@@ -10,3 +10,11 @@ dependencies = [
     "langchain-openai>=0.2.14",
     "langgraph>=0.2.61",
 ]
+
+[dependency-groups]
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.5.49",
+    "mkdocstrings-python>=1.13.0",
+    "termynal>=0.12.2",
+]
