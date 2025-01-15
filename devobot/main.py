@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import json
+from typing import Any
 
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langgraph.graph import StateGraph, START, END
@@ -12,23 +13,16 @@ QUESTION = f"What is a Devoteam, {ROLE} role salary with 2 years of experience?"
 
 
 @dataclass
-class Fake:
-    content: str
-    additional_kwargs: dict | None = None
-    response_metadata: dict | None = None
-
-
-@dataclass
 class State:
     messages: list[BaseMessage]
 
 
-def node_tool_call(state: State):
+def node_tool_call(state: State) -> State:
     if Config.use_llm:
         salary_tool = llm.bind_tools([calculate_devoteam_salary])
         new_message = salary_tool.invoke(state.messages)
     else:
-        new_message = Fake(
+        new_message = BaseMessage(
             content="",
             additional_kwargs={
                 "tool_calls": [
@@ -50,7 +44,7 @@ def node_tool_call(state: State):
     return state
 
 
-def tool_salary(state: State):
+def tool_salary(state: State) -> State:
     tool_call = state.messages[-1].additional_kwargs["tool_calls"][0]
     kwargs = json.loads(tool_call["function"]["arguments"])
     salary = calculate_devoteam_salary(**kwargs)
@@ -58,7 +52,7 @@ def tool_salary(state: State):
     return state
 
 
-def edge_tool_condition(state: State):
+def edge_tool_condition(state: State) -> str:
     if not state.messages[-1].content:
         return "salary_calculation"
     else:

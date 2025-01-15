@@ -1,3 +1,6 @@
+# mypy: ignore-errors
+
+
 class Singleton(type):
     _instances = {}
 

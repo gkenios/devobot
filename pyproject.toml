@@ -16,6 +16,7 @@ dev = [
     "mypy>=1.14.1",
     "pre-commit>=4.0.1",
     "ruff>=0.9.1",
+    "types-pyyaml>=6.0.12.20241230",
 ]
 docs = [
     "mkdocs>=1.6.1",
@@ -29,3 +30,6 @@ tests = [
 
 [tool.ruff]
 line-length = 80
+
+# uv lock --upgrade
+# uv sync --all-groups

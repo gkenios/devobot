@@ -1,42 +1,43 @@
 from abc import ABC, abstractmethod
 import os
 
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import AzureChatOpenAI
-from langchain_openai.chat_models.base import BaseChatOpenAI
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 
 class LLM(BaseModel, ABC):
     model: str
-    api_key: str
+    api_key: SecretStr
     api_url: str | None = None
     api_version: str | None = None
 
     @abstractmethod
-    def auth(self):
+    def auth(self) -> BaseChatModel:
         raise NotImplementedError
 
 
 class AzureLLM(LLM):
-    def auth(self):
+    def auth(self) -> BaseChatModel:
         return AzureChatOpenAI(
             azure_endpoint=self.api_url,
-            deployment_name=self.model,
-            openai_api_key=self.api_key,
-            openai_api_version=self.api_version,
+            azure_deployment=self.model,
+            api_key=self.api_key,
+            api_version=self.api_version,
         )
 
 
 def get_llm(
     model: str,
-    api_key: str = os.getenv("API_KEY"),
+    api_key: SecretStr = os.getenv("API_KEY"),  # type: ignore
     api_url: str | None = None,
     api_version: str | None = None,
-) -> BaseChatOpenAI:
-    stripped_api_url = api_url.strip("/")
-    if stripped_api_url.endswith("azure.com"):
+) -> BaseChatModel:
+    if isinstance(api_url, str) and api_url.strip("/").endswith("azure.com"):
         obj = AzureLLM
     # This is a placeholder for future LLM
+    else:
+        pass
     return obj(
         model=model,
         api_key=api_key,
