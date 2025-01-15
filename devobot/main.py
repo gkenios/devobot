@@ -8,7 +8,7 @@ from devobot.config import Config, llm
 
 
 ROLE = "lead"  # In: "junior", "senior", "lead"
-QUESTION = f"What is the salary of a Devoteam {ROLE} role with 2 years of experience?"
+QUESTION = f"What is a Devoteam, {ROLE} role salary with 2 years of experience?"
 
 
 @dataclass
@@ -25,7 +25,8 @@ class State:
 
 def node_tool_call(state: State):
     if Config.use_llm:
-        new_message = llm.bind_tools([calculate_devoteam_salary]).invoke(state.messages)
+        salary_tool = llm.bind_tools([calculate_devoteam_salary])
+        new_message = salary_tool.invoke(state.messages)
     else:
         new_message = Fake(
             content="",
@@ -50,9 +51,8 @@ def node_tool_call(state: State):
 
 
 def tool_salary(state: State):
-    kwargs = json.loads(
-        state.messages[-1].additional_kwargs["tool_calls"][0]["function"]["arguments"]
-    )
+    tool_call = state.messages[-1].additional_kwargs["tool_calls"][0]
+    kwargs = json.loads(tool_call["function"]["arguments"])
     salary = calculate_devoteam_salary(**kwargs)
     state.messages.append(AIMessage(content=f"The salary is {salary}."))
     return state
