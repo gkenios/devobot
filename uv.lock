@@ -202,8 +202,8 @@ docs = [
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115.6" },
     { name = "langchain", specifier = ">=0.3.14" },
-    { name = "langchain-openai", specifier = ">=0.2.14" },
-    { name = "langgraph", specifier = ">=0.2.61" },
+    { name = "langchain-openai", specifier = ">=0.3.0" },
+    { name = "langgraph", specifier = ">=0.2.62" },
 ]
 
 [package.metadata.requires-dev]
