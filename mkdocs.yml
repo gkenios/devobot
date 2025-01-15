@@ -99,7 +99,10 @@ markdown_extensions:
 
 plugins:
   - search
-  - termynal
+  - termynal:
+      prompt_literal_start:
+        - "$"
+        - ">"
   - mkdocstrings:
       handlers:
         python:
