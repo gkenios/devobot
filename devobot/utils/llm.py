@@ -34,11 +34,11 @@ def get_llm(
     api_version: str | None = None,
 ) -> BaseChatModel:
     if isinstance(api_url, str) and api_url.strip("/").endswith("azure.com"):
-        obj = AzureLLM
+        llm_object = AzureLLM
     # This is a placeholder for future LLM
     else:
         pass
-    return obj(
+    return llm_object(
         model=model,
         api_key=api_key,
         api_url=api_url,
