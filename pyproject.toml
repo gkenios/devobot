@@ -5,23 +5,23 @@ description = "A chatbot solution to get answers to FAQs."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi>=0.115.6",
-    "langchain>=0.3.14",
-    "langchain-openai>=0.3.0",
-    "langgraph>=0.2.62",
+    "fastapi>=0.115.8",
+    "langchain>=0.3.18",
+    "langchain-openai>=0.3.5",
+    "langgraph>=0.2.72",
 ]
 
 [dependency-groups]
 dev = [
-    "mypy>=1.14.1",
-    "pre-commit>=4.0.1",
-    "ruff>=0.9.1",
+    "mypy>=1.15.0",
+    "pre-commit>=4.1.0",
+    "ruff>=0.9.6",
     "types-pyyaml>=6.0.12.20241230",
 ]
 docs = [
     "mkdocs>=1.6.1",
-    "mkdocs-material>=9.5.49",
-    "mkdocstrings-python>=1.13.0",
+    "mkdocs-material>=9.6.4",
+    "mkdocstrings-python>=1.15.0",
     "termynal>=0.13.0",
 ]
 tests = [
@@ -32,4 +32,4 @@ tests = [
 line-length = 80
 
 # uv lock --upgrade
-# uv sync --all-groups
+# uv sync -U --all-groups
