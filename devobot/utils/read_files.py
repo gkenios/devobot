@@ -28,7 +28,10 @@ def read_file(file_path: str, context: dict[str, Any] | None = None) -> Any:
     return data
 
 
-def render_dict_with_jinja(data: dict, context: dict[str, str]) -> dict:
+def render_dict_with_jinja(
+    data: Any,
+    context: dict[str, str],
+) -> Any:
     """Recursively renders a dictionary structure with Jinja2 templates.
 
     Args:
@@ -39,9 +42,9 @@ def render_dict_with_jinja(data: dict, context: dict[str, str]) -> dict:
         The rendered data (as a Python object).
     """
 
-    def _render(data, context):
+    def _render(data: Any, context: dict[str, str]) -> Any:
         if isinstance(data, dict):
-            new_data = {}
+            new_data = dict()
             for key, value in data.items():
                 # Recurse for dict values
                 new_data[key] = _render(value, context)

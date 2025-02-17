@@ -2,11 +2,12 @@ from .main import CONFIG_FILE
 from devobot.services import (
     Auth,
     AuthFactory,
-    BaseChatModel,
     SecretFactory,
     get_llm,
 )
 from devobot.utils import Singleton, read_file
+
+from langchain_core.language_models.chat_models import BaseChatModel
 
 
 class ConfigSingleton(metaclass=Singleton):
@@ -25,12 +26,12 @@ class ConfigSingleton(metaclass=Singleton):
     def build_auth(self) -> None:
         for host_object in self.config["secrets"]["hosts"]:
             vault_host = host_object["name"]
-            self.auth[vault_host] = AuthFactory[vault_host].value.login()
+            self.auth[vault_host] = AuthFactory[vault_host].value()
 
-    def get_models(self):
-        models_conf: dict = self.config["models"]
+    def get_models(self) -> None:
+        models_conf: dict[str, dict[str, str]] = self.config["models"]
         for model in models_conf.keys():
-            self.models[model] = get_llm(**models_conf[model])
+            self.models[model] = get_llm(**models_conf[model])  # type: ignore
 
     def get_secrets(self) -> None:
         # Iterate over hosts

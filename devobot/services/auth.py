@@ -8,24 +8,24 @@ if TYPE_CHECKING:
 
 
 class Auth(ABC):
-    @classmethod
-    def login(cls) -> Any:
-        return cls._login()
+    def __init__(self) -> None:
+        self.auth = self._auth()
 
+    @classmethod
     @abstractmethod
-    def _login(cls) -> Any:
+    def _auth(cls) -> Any:
         raise NotImplementedError
 
 
 class LocalAuth(Auth):
     @classmethod
-    def _login(cls) -> None:
+    def _auth(cls) -> None:
         return
 
 
 class AzureAuth(Auth):
     @classmethod
-    def _login(cls) -> "DefaultAzureCredential":
+    def _auth(cls) -> "DefaultAzureCredential":
         try:
             from azure.identity import DefaultAzureCredential
         except ImportError as error:
@@ -38,7 +38,7 @@ class AzureAuth(Auth):
 
 class GCPAuth(Auth):
     @classmethod
-    def _login(cls) -> Any:
+    def _auth(cls) -> Any:
         raise NotImplementedError("GCP authentication is not implemented yet.")
 
 

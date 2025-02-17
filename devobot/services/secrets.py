@@ -1,18 +1,13 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 import os
-from typing import TYPE_CHECKING
 
 from .auth import Auth
 
 
-if TYPE_CHECKING:
-    from azure.keyvault.secrets import SecretClient
-
-
 class Secret(ABC):
     def __init__(self, auth: Auth) -> None:
-        self.auth = auth
+        self.auth = auth.auth
 
     def get(
         self,
@@ -43,22 +38,22 @@ class Secret(ABC):
         }
 
     @abstractmethod
-    def _get(self, secret_name: str, vault_name: str) -> str:
+    def _get(self, secret_name: str, vault_name: str | None) -> str | None:
         pass
 
 
 class LocalSecret(Secret):
-    def _get(self, secret_name: str, vault_name: str | None) -> str:
+    def _get(self, secret_name: str, vault_name: str | None) -> str | None:
         if vault_name:
             raise ValueError("Local secrets do not have vaults.")
         return os.getenv(secret_name)
 
 
 class AzureSecret(Secret):
-    def __init__(self, auth: Auth) -> None:
-        self.auth = auth
+    def _get(self, secret_name: str, vault_name: str | None) -> str | None:
+        if not vault_name:
+            raise ValueError("Azure secrets require a key vault name.")
 
-    def _get(self, secret_name: str, vault_name: str) -> "SecretClient":
         try:
             from azure.keyvault.secrets import SecretClient
         except ImportError as error:
@@ -75,7 +70,8 @@ class AzureSecret(Secret):
 
 
 class GCPSecret(Secret):
-    def _get(self, secret_name: str, vault_name: str) -> str:
+    def _get(self, secret_name: str, vault_name: str | None) -> str | None:
+        print(f"Please change host for secret: '{vault_name}.{secret_name}'.")
         raise NotImplementedError("GCP secrets are not implemented yet.")
 
 
