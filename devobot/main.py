@@ -4,7 +4,7 @@ import json
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langgraph.graph import StateGraph, START, END
 
-from devobot.config import Config, llm
+from devobot.config import llm
 
 
 ROLE = "lead"  # In: "junior", "senior", "lead"
@@ -17,29 +17,8 @@ class State:
 
 
 def node_tool_call(state: State) -> State:
-    if Config.use_llm:
-        salary_tool = llm.bind_tools([calculate_devoteam_salary])
-        new_message = salary_tool.invoke(state.messages)
-    else:
-        new_message = BaseMessage(
-            content="",
-            additional_kwargs={
-                "tool_calls": [
-                    {
-                        "function": {
-                            "name": "calculate_devoteam_salary",
-                            "arguments": f'{{"role": "{ROLE}", "years_of_experience": 2}}',
-                        }
-                    }
-                ]
-            },
-        )
-    state.messages.append(
-        AIMessage(
-            content=new_message.content,
-            additional_kwargs=new_message.additional_kwargs,
-        )
-    )
+    salary_tool = llm.bind_tools([calculate_devoteam_salary])
+    salary_tool.invoke(state.messages)
     return state
 
 

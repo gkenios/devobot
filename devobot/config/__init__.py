@@ -1,5 +1,5 @@
 from .main import ENV
-from .yaml_config import Config, llm
+from .yaml_config import embeddings, llm
 
 
-__all__ = ["Config", "ENV", "llm"]
+__all__ = ["ENV", "embeddings", "llm"]

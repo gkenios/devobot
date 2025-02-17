@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-import os
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import AzureChatOpenAI
@@ -29,7 +28,7 @@ class AzureLLM(LLM):
 
 def get_llm(
     model: str,
-    api_key: SecretStr = os.getenv("API_KEY"),  # type: ignore
+    api_key: SecretStr,
     api_url: str | None = None,
     api_version: str | None = None,
 ) -> BaseChatModel:
