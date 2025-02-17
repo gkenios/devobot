@@ -9,7 +9,6 @@ from devobot.services import (
 from devobot.utils import Singleton, read_file
 
 
-
 class ConfigSingleton(metaclass=Singleton):
     """Class to store the configuration."""
 

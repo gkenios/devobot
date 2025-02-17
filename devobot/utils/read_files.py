@@ -54,7 +54,7 @@ def render_dict_with_jinja(data: dict, context: dict[str, str]) -> dict:
                 template = Template(data)
                 return template.render(context)
             except Exception as error:
-                raise(f"Jinja2 Error in '{data}': {error}") from error
+                raise Exception(f"Jinja2 error parsing: \n{data}") from error
         else:
             return data
 

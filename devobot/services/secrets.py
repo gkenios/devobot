@@ -23,7 +23,7 @@ class Secret(ABC):
             return self._get_one(secret_name, vault_name)
         return self._get_all(secret_name, vault_name)
 
-    def _get_one(self, secret_name: str, vault_name: str | None)-> str:
+    def _get_one(self, secret_name: str, vault_name: str | None) -> str:
         key = self._get(secret_name, vault_name)
         if not key:
             vault_name = vault_name or "environment variables"

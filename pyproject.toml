@@ -41,7 +41,10 @@ tests = [
 ]
 
 [tool.ruff]
-line-length = 81
+line-length = 80
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 # uv lock --upgrade
 # uv sync -U --all-groups
