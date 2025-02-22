@@ -29,4 +29,6 @@ models:
     api_version: "2024-10-21" # https://learn.microsoft.com/en-us/azure/ai-services/openai/api-version-deprecation#latest-ga-api-release
     model: text-embedding-ada-002
 
-databases: null
+databases:
+  vector:
+    
