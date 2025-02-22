@@ -48,3 +48,4 @@ convention = "google"
 
 # uv lock --upgrade
 # uv sync -U --all-groups
+# uv pip install -e .[azure,local]
