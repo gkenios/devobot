@@ -1,72 +1,33 @@
-from dataclasses import dataclass
-import json
-
-from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langgraph.graph import StateGraph, START, END
 
-from devobot.config import llm
+from devobot.agent import State, graph_node, rag
+from devobot.config import Config, embeddings, llm
+from devobot.services.database_vector import ChromaVectorDB
 
 
-ROLE = "lead"  # In: "junior", "senior", "lead"
-QUESTION = f"What is a Devoteam, {ROLE} role salary with 2 years of experience?"
+QUESTION = "What time can I park my car in the Devoteam office?"
 
 
-@dataclass
-class State:
-    messages: list[BaseMessage]
-
-
-def node_tool_call(state: State) -> State:
-    salary_tool = llm.bind_tools([calculate_devoteam_salary])
-    salary_tool.invoke(state.messages)
-    return state
-
-
-def tool_salary(state: State) -> State:
-    tool_call = state.messages[-1].additional_kwargs["tool_calls"][0]
-    kwargs = json.loads(tool_call["function"]["arguments"])
-    salary = calculate_devoteam_salary(**kwargs)
-    state.messages.append(AIMessage(content=f"The salary is {salary}."))
-    return state
-
-
-def edge_tool_condition(state: State) -> str:
-    if not state.messages[-1].content:
-        return "salary_calculation"
-    else:
-        return END
-
-
-def calculate_devoteam_salary(role: str, years_of_experience: int) -> int:
-    """It calculates the salary of a Devoteam employee"""
-    if role == "junior":
-        return 30000 + years_of_experience * 1000
-    elif role == "senior":
-        return 40000 + years_of_experience * 2000
-    elif role == "lead":
-        return 50000 + years_of_experience * 3000
-    else:
-        return 0
+def other(state: State):
+    return State(question=state["question"], answer="Hello")
 
 
 builder = StateGraph(State)
 # Nodes
-builder.add_node("tool_call", node_tool_call)
-builder.add_node("salary_calculation", tool_salary)
-# Edges
-builder.add_edge(START, "tool_call")
-builder.add_conditional_edges("tool_call", edge_tool_condition)
-builder.add_edge("salary_calculation", END)
-
-result = State(
-    **builder.compile().invoke(
-        State(
-            messages=[
-                HumanMessage(QUESTION),
-            ]
-        )
-    )
+builder.add_node(
+    node="rag",
+    action=graph_node(
+        rag,
+        vector_db=ChromaVectorDB(collection_name="faq", embeddings=embeddings),
+        llm=llm,
+        prompt=Config.config["agent"]["rag"]["prompt"],
+    ),
 )
-for message in result.messages:
-    if message.content:
-        print(message.content)
+# builder.add_node("rag", other)
+# Edges
+builder.add_edge(START, "rag")
+builder.add_edge("rag", END)
+
+graph = builder.compile()
+response = graph.invoke({"question": QUESTION})
+print(response)
