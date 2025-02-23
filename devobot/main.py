@@ -12,17 +12,17 @@ def other(state: State):
     return State(question=state["question"], answer="Hello")
 
 
+wrapped_rag = graph_node(
+    rag,
+    vector_db=ChromaVectorDB(collection_name="faq", embeddings=embeddings),
+    llm=llm,
+    prompt=Config.config["agent"]["rag"]["prompt"],
+)
+
+
 builder = StateGraph(State)
 # Nodes
-builder.add_node(
-    node="rag",
-    action=graph_node(
-        rag,
-        vector_db=ChromaVectorDB(collection_name="faq", embeddings=embeddings),
-        llm=llm,
-        prompt=Config.config["agent"]["rag"]["prompt"],
-    ),
-)
+builder.add_node(node="rag", action=wrapped_rag)
 # builder.add_node("rag", other)
 # Edges
 builder.add_edge(START, "rag")
