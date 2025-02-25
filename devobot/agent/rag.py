@@ -4,13 +4,13 @@ from ._common import State
 from devobot.services.database_vector import VectorDB
 
 
-def rag(
+async def rag(
     state: State,
     vector_db: VectorDB,
     llm: BaseChatModel,
     prompt: str,
     number_of_docs: int = 3,
-) -> str:
+) -> State:
     question = state["question"]
 
     # Retrieve documents
@@ -19,5 +19,10 @@ def rag(
 
     # Generate response
     formated_prompt = prompt.format(question=question, context=context)
-    response = llm.invoke(formated_prompt)
-    return State(question=question, answer=response.content)
+    # response = await llm.ainvoke(formated_prompt)
+    # return State(question=question, answer=response.content)
+    response = ""
+    async for chunk in llm.astream(formated_prompt):
+        yield {"answer": chunk}  # Yield each chunk as it arrives
+        response += chunk.content
+    yield {"question": question, "answer": response}

@@ -7,7 +7,16 @@ class State(TypedDict):
 
 
 def graph_node(func, **wrapper_kwargs):
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs, **wrapper_kwargs)
+    async def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs, **wrapper_kwargs)
+
+        # If it's an async generator
+        if hasattr(result, "__aiter__"):
+            async for item in result:
+                # Stream each yielded value
+                yield item
+        else:
+            # Yield final result
+            yield await result
 
     return wrapper
