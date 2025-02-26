@@ -19,10 +19,8 @@ async def rag(
 
     # Generate response
     formated_prompt = prompt.format(question=question, context=context)
-    # response = await llm.ainvoke(formated_prompt)
-    # return State(question=question, answer=response.content)
     response = ""
     async for chunk in llm.astream(formated_prompt):
-        yield {"answer": chunk}  # Yield each chunk as it arrives
+        yield State(answer=chunk)  # Yield each chunk as it arrives
         response += chunk.content
-    yield {"question": question, "answer": response}
+    yield State(question=question, answer=response)  # Yield final response
