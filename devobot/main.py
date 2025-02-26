@@ -4,20 +4,11 @@ import time
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
 
-from devobot.agent import State, graph_node, rag
-from devobot.config import Config, embeddings, llm
-from devobot.services.database_vector import ChromaVectorDB
+from devobot.agent import State
+from devobot.config import AgentNode
 
 
 QUESTION = "What time can I park my car in the Devoteam office?"
-
-
-wrapped_rag = graph_node(
-    rag,
-    vector_db=ChromaVectorDB(collection_name="faq", embeddings=embeddings),
-    llm=llm,
-    prompt=Config.config["agent"]["rag"]["prompt"],
-)
 
 
 async def main(graph: CompiledStateGraph):
@@ -33,7 +24,7 @@ async def main(graph: CompiledStateGraph):
 if __name__ == "__main__":
     builder = StateGraph(State)
     # Nodes
-    builder.add_node(node="rag", action=wrapped_rag)
+    builder.add_node(node="rag", action=getattr(AgentNode, "rag"))
     # Edges
     builder.add_edge(START, "rag")
     builder.add_edge("rag", END)
