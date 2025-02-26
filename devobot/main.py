@@ -18,8 +18,7 @@ async def main(graph: CompiledStateGraph):
     ):
         if msg.content:
             print(msg.content, end="", flush=True)
-            time.sleep(0.1)
-
+            await asyncio.sleep(0.1)
 
 if __name__ == "__main__":
     builder = StateGraph(State)
