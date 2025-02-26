@@ -64,13 +64,11 @@ class ChromaVectorDB(VectorDB):
         id: list[str] | None = None,
         metadata: list[dict[str, Any]] | None = None,
     ) -> None:
-        for i in range(len(content)):
-            self.vector_store.add_texts(
-                texts=content,
-                ids=id,
-                metadatas=metadata,
-            )
-
+        self.vector_store.add_texts(
+            texts=content,
+            ids=id,
+            metadatas=metadata,
+        )
     def _delete(self, id: list[str] | None, **kwargs) -> None:
         self.vector_store.delete(ids=id, **kwargs)
 
