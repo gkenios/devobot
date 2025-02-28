@@ -3,10 +3,12 @@ from devobot.services import (
     Auth,
     AuthFactory,
     SecretFactory,
+    get_embeddings,
     get_llm,
 )
 from devobot.utils import Singleton, read_file
 
+from langchain_core.embeddings import Embeddings
 from langchain_core.language_models.chat_models import BaseChatModel
 
 
@@ -17,7 +19,7 @@ class ConfigSingleton(metaclass=Singleton):
         self.config = read_file(CONFIG_FILE)
         self.auth: dict[str, Auth] = dict()
         self.secrets: dict[str, str] = dict()
-        self.models: dict[str, BaseChatModel] = dict()
+        self.models: dict[str, BaseChatModel | Embeddings] = dict()
 
         self.build_auth()
         self.get_secrets()
@@ -30,8 +32,8 @@ class ConfigSingleton(metaclass=Singleton):
 
     def get_models(self) -> None:
         models_conf: dict[str, dict[str, str]] = self.config["models"]
-        for model in models_conf.keys():
-            self.models[model] = get_llm(**models_conf[model])  # type: ignore
+        self.models["llm"] = get_llm(**models_conf["llm"])  # type: ignore
+        self.models["embeddings"] = get_embeddings(**models_conf["embeddings"])  # type: ignore
 
     def get_secrets(self) -> None:
         # Iterate over hosts
