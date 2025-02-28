@@ -33,11 +33,35 @@ databases:
   vector: null
 
 agent:
-  start: null
-  rag:
-    prompt: |-
-      You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
-      Question: {question}
-      Context: {context}
-      Answer:
-  stop: null
+  nodes:
+    intent:
+      function: intent
+      prompt: |-
+        Devoteam is an international consulting firm. Devoteam employees are going to ask you questions.
+        - If the question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ), respond with '{"intent": "faq"}'.
+        - If the question is about booking a desk for team events, respond with '{"intent": "book_desk", "date": "YYYY-MM-DD", "people": <number of people>}'.
+        - If the question is irrelevant, respond with '{"intent": "other"}'.
+
+        In the case of a question about booking a desk, make sure to get a confirmation from the user before booking the desk, including the information related to the date and amount of people. Also make sure that the date is either today or in the future.
+        For context, today's date is {today}.
+        For example:
+        - "What is the address of the office?" -> '{"intent": "faq"}'
+        - "Can I book a desk for 20 people on the 2nd of April?" -> '{"intent": "book_desk", "date": "2023-04-02", "people": 20}'
+        - "What is the capital of France?" -> '{"intent": "other"}'
+    rag:
+      function: rag
+      prompt: |-
+        You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
+        Question: {question}
+        Context: {context}
+        Answer:
+    book_desk_confirmation:
+      function: api_call
+      prompt: null
+      response: |-
+        I have booked a desk for {people} people on the {date}. Enjoy your event!
+    book_desk:
+      function: api_call
+      prompt: null
+      response: |-
+        I have booked a desk for {people} people on the {date}. Enjoy your event!
