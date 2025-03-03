@@ -33,63 +33,68 @@ databases:
   vector: null
 
 agent:
-  nodes:
-    start:
-      next: intent
+- id: start
+  function: start
+  next: intent
 
-    intent:
-      function: classify
-      prompt: |-
-        Devoteam is an international consulting firm. Devoteam employees are going to ask you questions.
-        - If the question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ), respond with '{"intent": "faq", "other": null}'.
-        - If the question is about booking a desk for team events, respond with '{"classification": "book_desk", "other": {"date": "YYYY-MM-DD", "people": <number of people>}}'.
-        - If the question is irrelevant, respond with '{"classification": "reject", "other": null}'.
+- id: intent
+  function: classify
+  next_conditional:
+    classification:
+      faq: faq
+      book_desk: book_desk_confirmation
+      reject: start
+  parameters:
+    prompt: |-
+      Devoteam is an international consulting firm. Devoteam employees are going to ask you questions.
+      - If the question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ), respond with '{"intent": "faq", "other": null}'.
+      - If the question is about booking a desk for team events, respond with '{"classification": "book_desk", "other": {"date": "YYYY-MM-DD", "people": <number of people>}}'.
+      - If the question is irrelevant, respond with '{"classification": "reject", "other": null}'.
 
-        In the case of a question about booking a desk, make sure to get a confirmation from the user before booking the desk, including the information related to the date and amount of people. Also make sure that the date is either today or in the future.
-        For context, today's date is {today}.
-        For example:
-        - "What is the address of the office?" -> '{"classification": "faq", "other": null}'
-        - "Can I book a desk for 20 people on the 2nd of April?" -> '{"classification": "book_desk", "other": {"date": "2023-04-02", "people": 20}}'
-        - "What is the capital of France?" -> '{"classification": "reject", "other": null}'
-      classes:
-        classification: str
-        other:
-          date: str
-          people: int
-      next_conditional:
-        classification:
-          faq: faq
-          book_desk: book_desk_confirmation
-          reject: start
+      In the case of a question about booking a desk, make sure to get a confirmation from the user before booking the desk, including the information related to the date and amount of people. Also make sure that the date is either today or in the future.
+      For context, today's date is {today}.
+      For example:
+      - "What is the address of the office?" -> '{"classification": "faq", "other": null}'
+      - "Can I book a desk for 20 people on the 2nd of April?" -> '{"classification": "book_desk", "other": {"date": "2023-04-02", "people": 20}}'
+      - "What is the capital of France?" -> '{"classification": "reject", "other": null}'
+    classes:
+      classification: str
+      other:
+        date: str
+        people: int
 
-    rag:
-      function: rag
-      prompt: |-
-        You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
-        Question: {question}
-        Context: {context}
-        Answer:
-      next: [end]
+- id: rag
+  next: end
+  function: rag
+  function_params:
+    prompt: |-
+      You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
+      Question: {question}
+      Context: {context}
+      Answer:
 
-    book_desk_confirmation:
-      function: defined_response
-      prompt: null
-      response: |-
-        You want to book desks for {people} people on the {date}. Is that correct?
+- id: book_desk_confirmation
+  function: defined_response
+  prompt: null
+  response: |-
+    You want to book desks for {people} people on the {date}. Is that correct?
 
-    book_desk_response:
-      function: classify
-      prompt: |-
-        You have booked a desk for {people} people on the {date}. Enjoy your event!
-      classes:
-        book_desk: bool
-      next_conditional:
-        book_desk:
-          true: book_desk
-          false: start
+  book_desk_response:
+    function: classify
+    prompt: |-
+      You have booked a desk for {people} people on the {date}. Enjoy your event!
+    classes:
+      book_desk: bool
+    next_conditional:
+      book_desk:
+        true: book_desk
+        false: start
 
-    book_desk:
-      function: api_call
-      prompt: null
-      response: |-
-        I have booked a desk for {people} people on the {date}. Enjoy your event!
+  book_desk:
+    function: api_call
+    prompt: null
+    response: |-
+      I have booked a desk for {people} people on the {date}. Enjoy your event!
+
+- id: end
+  function: end

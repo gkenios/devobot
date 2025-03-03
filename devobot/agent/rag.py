@@ -11,6 +11,22 @@ async def rag(
     prompt: str,
     number_of_docs: int = 3,
 ) -> State:
+    """Retrieve and generate response using RAG on the given vector database.
+
+    Defined in config file node parameters:
+    - prompt: The prompt to be used for the RAG model.
+    - number_of_docs: The number of documents to retrieve from the database.
+
+    Args:
+        state: The State object passed between nodes.
+        vector_db: The database object to retrieve documents.
+        llm: The language model to generate response.
+        prompt: The prompt to be used for the RAG model.
+        number_of_docs: The number of documents to retrieve from the database.
+
+    Returns:
+        State: The State object with the answer to the question.
+    """
     question = state["question"]
 
     # Retrieve documents
