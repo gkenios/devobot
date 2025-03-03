@@ -33,3 +33,7 @@ dmypy.json
 
 # mkdocs documentation
 /site
+
+# Vector Databases
+.chromadb/
+chroma.log
