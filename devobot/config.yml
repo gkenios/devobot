@@ -56,7 +56,7 @@ agent:
         other:
           date: str
           people: int
-      next:
+      next_conditional:
         classification:
           faq: faq
           book_desk: book_desk_confirmation
@@ -75,7 +75,18 @@ agent:
       function: defined_response
       prompt: null
       response: |-
-        I have booked a desk for {people} people on the {date}. Enjoy your event!
+        You want to book desks for {people} people on the {date}. Is that correct?
+
+    book_desk_response:
+      function: classify
+      prompt: |-
+        You have booked a desk for {people} people on the {date}. Enjoy your event!
+      classes:
+        book_desk: bool
+      next_conditional:
+        book_desk:
+          true: book_desk
+          false: start
 
     book_desk:
       function: api_call
