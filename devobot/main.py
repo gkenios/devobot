@@ -23,7 +23,8 @@ async def main(graph: CompiledStateGraph):
 if __name__ == "__main__":
     builder = StateGraph(State)
     # Nodes
-    builder.add_node(node="rag", action=getattr(AgentNode, "rag"))
+    #builder.add_node(node="rag", action=getattr(AgentNode, "rag"))
+    builder.add_node(node="rag", action=getattr(AgentNode, "classify"))
     # Edges
     builder.add_edge(START, "rag")
     builder.add_edge("rag", END)
