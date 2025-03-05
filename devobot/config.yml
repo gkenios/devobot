@@ -34,17 +34,17 @@ databases:
 
 agent:
 - id: start
-  function: start
   next: intent
+  function: start
 
 - id: intent
-  function: classify
   next_conditional:
     classification:
       faq: faq
       book_desk: book_desk_confirmation
       reject: start
-  parameters:
+  function: classify
+  function_params:
     prompt: |-
       Devoteam is an international consulting firm. Devoteam employees are going to ask you questions.
       - If the question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ), respond with '{"intent": "faq", "other": null}'.
