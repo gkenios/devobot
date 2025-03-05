@@ -1,9 +1,10 @@
-from typing import TypedDict
+from typing import Any, TypedDict
 
 
 class State(TypedDict):
     question: str
     answer: str
+    other: Any
 
 
 def graph_node(func, **wrapper_kwargs):
