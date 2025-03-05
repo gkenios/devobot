@@ -1,34 +1,52 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Self
+
+from config import AgentNodeConfig
 
 
 @dataclass
-class NodeConfig:
-    id: str
-    function: str
-    function_params: dict[str, Any] | None = None
-    next: str | list[str] | None = None
-    next_conditional: dict[str, Any] | None = None
+class NodeState:
+    config: AgentNodeConfig
+    input: str
+    output: str | None = None
+
+    def __or__(self, other: Self) -> Self:
+        if not isinstance(other, NodeState):
+            raise ValueError("Can only add NodeState objects")
+
+        config = other.config
+        input = self.input or other.input
+        output = self.output or other.output
+        return NodeState(config=config, input=input, output=output)
 
 
 @dataclass
-class Node:
-    conf: NodeConfig
+class State:
+    lineage: list[NodeState]
     input: str
     output: str | None = None
     other: Any | None = None
 
 
-@dataclass
-class State:
-    lineage: list[Node]
-    question: str
-    answer: str | None = None
-
-
-def graph_node(func, **wrapper_kwargs):
+def graph_node(func, config: AgentNodeConfig, **wrapper_kwargs):
     async def wrapper(*args, **kwargs):
+        state: State = wrapper_kwargs.get("state")
+        if not state:
+            state = args[0]
+
+        if not state.lineage:
+            node_input = state.input
+        else:
+            node_input = state.lineage[-1].output
+
+        before_state = NodeState(
+            config=config,
+            input=node_input,
+        )
+        state.lineage.append(before_state)
+
         result = func(*args, **kwargs, **wrapper_kwargs)
+        result = result or before_state
 
         # If it's an async generator
         if hasattr(result, "__aiter__"):

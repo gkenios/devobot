@@ -25,6 +25,7 @@ async def classify(
         "properties": schema,
         "required": required,
     }
+    # TODO: Deal with State
     structured_llm = llm.with_structured_output(json_schema)
     answer = await structured_llm.ainvoke(question)
     return State(question=question, answer=answer)

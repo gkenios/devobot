@@ -7,7 +7,7 @@ agent:
   next_conditional:
     classification:
       faq: faq
-      book_desk: book_desk_confirmation
+      book_desk: end
       reject: start
   function: classify
   function_params:
@@ -39,7 +39,7 @@ agent:
             description: The number of people for booking a desk.
     required: [classification]
 
-- id: rag
+- id: faq
   next: end
   function: rag
   function_params:
