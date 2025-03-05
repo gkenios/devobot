@@ -1,37 +1,3 @@
-secrets:
-  hosts:  # Host names in [local, azure]
-  - name: local
-    vaults:
-    - name: null
-      secrets:
-      - name: llm_key  # Secret name in the application (unique)
-        value: LLM     # Secret name in the vault
-      - name: embeddings_key
-        value: EMBEDDINGS
-  # - name: azure
-  #   vaults:
-  #   - name: dvtm-gkenios-uva-dev-kv
-  #     secrets:
-  #     - name: llm_key  # Secret name in the application
-  #       value: LLM     # Secret name in the vault
-  #     - name: embeddings_key
-  #       value: EMBEDDINGS
-
-models:
-  llm:
-    api_key: "{{ llm_key }}"  # "{{ <secret> }}" references a secret by name
-    api_url: https://openai-devoteam.openai.azure.com/
-    api_version: "2024-10-21"  # Optional parameter
-    model: gpt-4o-mini
-  embeddings:
-    api_key: "{{ embeddings_key }}"
-    api_url: https://openai-devoteam.openai.azure.com/
-    api_version: "2024-10-21" # https://learn.microsoft.com/en-us/azure/ai-services/openai/api-version-deprecation#latest-ga-api-release
-    model: text-embedding-ada-002
-
-databases:
-  vector: null
-
 agent:
 - id: start
   next: intent
@@ -53,15 +19,25 @@ agent:
 
       In the case of a question about booking a desk, make sure to get a confirmation from the user before booking the desk, including the information related to the date and amount of people. Also make sure that the date is either today or in the future.
       For context, today's date is {today}.
-      For example:
-      - "What is the address of the office?" -> '{"classification": "faq", "other": null}'
-      - "Can I book a desk for 20 people on the 2nd of April?" -> '{"classification": "book_desk", "other": {"date": "2023-04-02", "people": 20}}'
-      - "What is the capital of France?" -> '{"classification": "reject", "other": null}'
-    classes:
-      classification: str
+    schema:
+      classification:
+        type: string
+        description: |-
+          The classification of the question.
+          - faq: The question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ).
+          - book_desk: The question is about booking a desk for team events.
+          - reject: The question is irrelevant.
       other:
-        date: str
-        people: int
+        type: object
+        description: Additional information only if the classification is book_desk.
+        properties:
+          date:
+            type: string
+            description: The date for booking a desk in the format YYYY-MM-DD.
+          people:
+            type: integer
+            description: The number of people for booking a desk.
+    required: [classification]
 
 - id: rag
   next: end
@@ -73,28 +49,68 @@ agent:
       Context: {context}
       Answer:
 
-- id: book_desk_confirmation
-  function: defined_response
-  prompt: null
-  response: |-
-    You want to book desks for {people} people on the {date}. Is that correct?
-
-  book_desk_response:
-    function: classify
-    prompt: |-
-      You have booked a desk for {people} people on the {date}. Enjoy your event!
-    classes:
-      book_desk: bool
-    next_conditional:
-      book_desk:
-        true: book_desk
-        false: start
-
-  book_desk:
-    function: api_call
-    prompt: null
-    response: |-
-      I have booked a desk for {people} people on the {date}. Enjoy your event!
-
 - id: end
   function: end
+
+
+databases:
+  vector: null
+
+
+models:
+  llm:
+    api_key: "{{ llm_key }}"  # "{{ <secret> }}" references a secret by name
+    api_url: https://openai-devoteam.openai.azure.com/
+    api_version: "2024-10-21"  # Optional parameter
+    model: gpt-4o-mini
+  embeddings:
+    api_key: "{{ embeddings_key }}"
+    api_url: https://openai-devoteam.openai.azure.com/
+    api_version: "2024-10-21" # https://learn.microsoft.com/en-us/azure/ai-services/openai/api-version-deprecation#latest-ga-api-release
+    model: text-embedding-ada-002
+
+
+secrets:
+  hosts:  # Host names in [local, azure]
+  - name: local
+    vaults:
+    - name: null
+      secrets:
+      - name: llm_key  # Secret name in the application (unique)
+        value: LLM     # Secret name in the vault
+      - name: embeddings_key
+        value: EMBEDDINGS
+
+  # - name: azure
+  #   vaults:
+  #   - name: dvtm-gkenios-uva-dev-kv
+  #     secrets:
+  #     - name: llm_key  # Secret name in the application
+  #       value: LLM     # Secret name in the vault
+  #     - name: embeddings_key
+  #       value: EMBEDDINGS
+
+
+
+# - id: book_desk_confirmation
+#   function: defined_response
+#   prompt: null
+#   response: |-
+#     You want to book desks for {people} people on the {date}. Is that correct?
+
+#   book_desk_response:
+#     function: classify
+#     prompt: |-
+#       You have booked a desk for {people} people on the {date}. Enjoy your event!
+#     classes:
+#       book_desk: bool
+#     next_conditional:
+#       book_desk:
+#         true: book_desk
+#         false: start
+
+#   book_desk:
+#     function: api_call
+#     prompt: null
+#     response: |-
+#       I have booked a desk for {people} people on the {date}. Enjoy your event!

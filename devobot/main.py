@@ -23,10 +23,11 @@ async def main(graph: CompiledStateGraph):
 if __name__ == "__main__":
     builder = StateGraph(State)
     # Nodes
-    #builder.add_node(node="rag", action=getattr(AgentNode, "rag"))
-    builder.add_node(node="rag", action=getattr(AgentNode, "classify"))
+    builder.add_node(node="classify", action=getattr(AgentNode, "classify"))
+    builder.add_node(node="rag", action=getattr(AgentNode, "rag"))
     # Edges
-    builder.add_edge(START, "rag")
+    builder.add_edge(START, "classify")
+    builder.add_conditional_edges("classify_condition", lambda x: x[""])
     builder.add_edge("rag", END)
 
     graph = builder.compile()
