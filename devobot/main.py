@@ -12,7 +12,7 @@ QUESTION = "What time can I park my car in the Devoteam office?"
 
 async def main(graph: CompiledStateGraph):
     async for msg, _ in graph.astream(
-        input=State(question=QUESTION),
+        input=State(lineage=[], question=QUESTION),
         stream_mode="messages",
     ):
         if msg.content:

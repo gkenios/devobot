@@ -27,7 +27,7 @@ async def rag(
     Returns:
         State: The State object with the answer to the question.
     """
-    question = state["question"]
+    question = state.question
 
     # Retrieve documents
     retrieve = vector_db.search(question, k=number_of_docs)
@@ -37,6 +37,9 @@ async def rag(
     formated_prompt = prompt.format(question=question, context=context)
     response = ""
     async for chunk in llm.astream(formated_prompt):
-        yield State(answer=chunk)  # Yield each chunk as it arrives
+        # Yield each chunk as it arrives
+        yield State(lineage=state.lineage, question=question, answer=chunk)
         response += chunk.content
-    yield State(question=question, answer=response)  # Yield final response
+
+    # Yield final response
+    yield State(lineage=state.lineage, question=question, answer=response)

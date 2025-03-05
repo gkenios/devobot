@@ -1,10 +1,29 @@
-from typing import Any, TypedDict
+from dataclasses import dataclass
+from typing import Any
 
 
-class State(TypedDict):
+@dataclass
+class NodeConfig:
+    id: str
+    function: str
+    function_params: dict[str, Any] | None = None
+    next: str | list[str] | None = None
+    next_conditional: dict[str, Any] | None = None
+
+
+@dataclass
+class Node:
+    conf: NodeConfig
+    input: str
+    output: str | None = None
+    other: Any | None = None
+
+
+@dataclass
+class State:
+    lineage: list[Node]
     question: str
-    answer: str
-    other: Any
+    answer: str | None = None
 
 
 def graph_node(func, **wrapper_kwargs):
