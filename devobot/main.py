@@ -23,12 +23,12 @@ async def main(graph: CompiledStateGraph):
 if __name__ == "__main__":
     builder = StateGraph(State)
     # Nodes
-    # builder.add_node(node="classify", action=getattr(AgentNode, "classify"))
-    builder.add_node(node="faq", action=getattr(AgentNode, "faq"))
+    builder.add_node(node="intent", action=getattr(AgentNode, "intent"))
+    # builder.add_node(node="faq", action=getattr(AgentNode, "faq"))
     # Edges
-    builder.add_edge(START, "faq")
+    builder.add_edge(START, "intent")
     # builder.add_conditional_edges("classify_condition", lambda x: x[""])
-    builder.add_edge("faq", END)
+    builder.add_edge("intent", END)
 
     graph = builder.compile()
     asyncio.run(main(graph))
