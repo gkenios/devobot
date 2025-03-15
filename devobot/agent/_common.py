@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Self
+from typing import Any, AsyncGenerator, Callable, Concatenate
 
 from config import AgentNodeConfig
 
@@ -10,51 +10,51 @@ class NodeState:
     input: str
     output: str | None = None
 
-    def __or__(self, other: Self) -> Self:
-        if not isinstance(other, NodeState):
-            raise ValueError("Can only add NodeState objects")
-
-        config = other.config
-        input = self.input or other.input
-        output = self.output or other.output
-        return NodeState(config=config, input=input, output=output)
-
 
 @dataclass
 class State:
+    input: str
     lineage: list[NodeState]
+
+
+@dataclass
+class NodeInteraction:
     input: str
     output: str | None = None
-    other: Any | None = None
 
 
-def graph_node(func, config: AgentNodeConfig, **wrapper_kwargs):
-    async def wrapper(*args, **kwargs):
-        state: State = wrapper_kwargs.get("state")
-        if not state:
-            state = args[0]
-
-        if not state.lineage:
-            node_input = state.input
-        else:
-            node_input = state.lineage[-1].output
-
-        before_state = NodeState(
-            config=config,
-            input=node_input,
-        )
-        state.lineage.append(before_state)
-
+def graph_node(
+    func: Callable[
+        Concatenate[State, ...], AsyncGenerator[NodeInteraction, None]
+    ],
+    config: AgentNodeConfig,
+    **wrapper_kwargs: dict[str, Any],
+) -> Callable[Concatenate[State, ...], AsyncGenerator[NodeInteraction, None]]:
+    async def wrapper(*args, **kwargs) -> AsyncGenerator[NodeInteraction, None]:
         result = func(*args, **kwargs, **wrapper_kwargs)
-        result = result or before_state
 
         # If it's an async generator
         if hasattr(result, "__aiter__"):
             async for item in result:
+                print("IT'S AN ASYNC GENERATOR")
                 # Stream each yielded value
                 yield item
         else:
             # Yield final result
-            yield await result
+            awaited_result: NodeInteraction = await result
+            yield awaited_result
+
+            # Get the state from the arguments
+            state: State = wrapper_kwargs.get("state")
+            if not state:
+                state = args[0]
+
+            # Update the lineage
+            latest_update = NodeState(
+                config=config,
+                input=awaited_result.input,
+                output=awaited_result.output,
+            )
+            state.lineage.append(latest_update)
 
     return wrapper

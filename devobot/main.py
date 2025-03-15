@@ -17,18 +17,21 @@ async def main(graph: CompiledStateGraph):
     ):
         if msg.content:
             print(msg.content, end="", flush=True)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.05)
 
 
 if __name__ == "__main__":
     builder = StateGraph(State)
-    # Nodes
+
+    # Test One
     builder.add_node(node="intent", action=getattr(AgentNode, "intent"))
-    # builder.add_node(node="faq", action=getattr(AgentNode, "faq"))
-    # Edges
     builder.add_edge(START, "intent")
-    # builder.add_conditional_edges("classify_condition", lambda x: x[""])
     builder.add_edge("intent", END)
+
+    # Test Two
+    # builder.add_node(node="faq", action=getattr(AgentNode, "faq"))
+    # builder.add_edge(START, "faq")
+    # builder.add_edge("faq", END)
 
     graph = builder.compile()
     asyncio.run(main(graph))

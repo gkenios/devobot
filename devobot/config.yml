@@ -8,7 +8,7 @@ agent:
     classification:
       faq: faq
       book_desk: end
-      reject: start
+      reject: end
   function: classify
   function_params:
     prompt: |-

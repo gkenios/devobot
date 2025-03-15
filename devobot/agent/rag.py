@@ -1,6 +1,8 @@
+from typing import AsyncGenerator
+
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from ._common import NodeState, State
+from ._common import NodeInteraction, State
 from devobot.services.database_vector import VectorDB
 
 
@@ -10,7 +12,7 @@ async def rag(
     llm: BaseChatModel,
     prompt: str,
     number_of_docs: int = 3,
-) -> NodeState:
+) -> AsyncGenerator[NodeInteraction, None]:
     """Retrieve and generate response using RAG on the given vector database.
 
     Defined in config file node parameters:
@@ -39,8 +41,8 @@ async def rag(
     response = ""
     async for chunk in llm.astream(formated_prompt):
         # Yield each chunk as it arrives
-        yield {"output": chunk}
+        yield NodeInteraction(input=question, output=chunk.content)
         response += chunk.content
 
     # Yield final response
-    yield State(lineage=state.lineage, input=question, output=response)
+    yield NodeInteraction(input=question, output=response)
