@@ -1,5 +1,5 @@
 from devobot.services.database_vector import ChromaVectorDB
-from devobot.config import embeddings
+from devobot.init.yaml_processing import embeddings
 
 
 page_content = "Parking is open at the Devoteam office from 08:00 to 21:00. Please visit our interanet to book a parking space."
