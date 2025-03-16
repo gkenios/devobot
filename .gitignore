@@ -5,6 +5,9 @@
 # VS Code
 __pycache__/
 
+# Project IDX
+.idx/
+
 # Unit test / coverage reports
 htmlcov/
 .tox/
