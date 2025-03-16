@@ -1,56 +1,57 @@
-from .main import CONFIG_FILE
+from langchain_core.embeddings import Embeddings
+from langchain_core.language_models.chat_models import BaseChatModel
+
+from devobot.config import CONFIG_FILE, YamlConfig
 from devobot.services import (
     Auth,
     AuthFactory,
     SecretFactory,
+    get_embeddings,
     get_llm,
 )
 from devobot.utils import Singleton, read_file
-
-from langchain_core.language_models.chat_models import BaseChatModel
 
 
 class ConfigSingleton(metaclass=Singleton):
     """Class to store the configuration."""
 
     def __init__(self) -> None:
-        self.config = read_file(CONFIG_FILE)
+        self.config = YamlConfig(**read_file(CONFIG_FILE))
         self.auth: dict[str, Auth] = dict()
         self.secrets: dict[str, str] = dict()
-        self.models: dict[str, BaseChatModel] = dict()
+        self.models: dict[str, BaseChatModel | Embeddings] = dict()
 
         self.build_auth()
         self.get_secrets()
         self.get_models()
 
     def build_auth(self) -> None:
-        for host_object in self.config["secrets"]["hosts"]:
-            vault_host = host_object["name"]
-            self.auth[vault_host] = AuthFactory[vault_host].value()
+        for host in self.config.secrets.hosts:
+            self.auth[host.name] = AuthFactory[host.name].value()
 
     def get_models(self) -> None:
-        models_conf: dict[str, dict[str, str]] = self.config["models"]
-        for model in models_conf.keys():
-            self.models[model] = get_llm(**models_conf[model])  # type: ignore
+        models_conf = self.config.models
+        self.models["llm"] = get_llm(**models_conf.llm.__dict__)
+        self.models["embeddings"] = get_embeddings(
+            **models_conf.embeddings.__dict__
+        )
 
     def get_secrets(self) -> None:
         # Iterate over hosts
-        for secret_object in self.config["secrets"]["hosts"]:
-            vault_host = secret_object["name"]
-            auth = self.auth[vault_host]
+        for host in self.config.secrets.hosts:
+            auth = self.auth[host.name]
 
             # Iterate over vaults
-            for vault_obj in secret_object["vaults"]:
-                vault_name = vault_obj["name"]
+            for vault in host.vaults:
                 secrets_mapping = dict()
-                for element in vault_obj["secrets"]:
-                    secrets_mapping[element["name"]] = element["value"]
+                for secret in vault.secrets:
+                    secrets_mapping[secret.name] = secret.value
 
                 # Get the secrets
                 retrieved_secrets = (
-                    SecretFactory[vault_host]
+                    SecretFactory[host.name]
                     .value(auth)
-                    .get(secrets_mapping.values(), vault_name)
+                    .get(secrets_mapping.values(), vault.name)
                 )
                 self.secrets.update(
                     {
@@ -59,7 +60,7 @@ class ConfigSingleton(metaclass=Singleton):
                     }
                 )
         # Re-red the config and parse the secrets
-        self.config = read_file(CONFIG_FILE, self.secrets)
+        self.config = YamlConfig(**read_file(CONFIG_FILE, self.secrets))
 
 
 Config = ConfigSingleton()

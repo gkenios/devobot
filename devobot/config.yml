@@ -1,0 +1,118 @@
+agent:
+- id: start
+  next: intent
+  function: start
+
+- id: intent
+  next_conditional:
+    key: classification
+    mapping:
+      faq: faq
+      book_desk: end
+      reject: end
+  function: classify
+  function_params:
+    prompt: |-
+      Devoteam is an international consulting firm. Devoteam employees are going to ask you questions.
+      - If the question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ), respond with '{"classification": "faq", "other": null}'.
+      - If the question is about booking a desk for team events, respond with '{"classification": "book_desk", "other": {"date": "YYYY-MM-DD", "people": <number of people>}}'.
+      - If the question is irrelevant, respond with '{"classification": "reject", "other": null}'.
+
+      In the case of a question about booking a desk, make sure to get a confirmation from the user before booking the desk, including the information related to the date and amount of people. Also make sure that the date is either today or in the future.
+      For context, today's date is {today}.
+    schema:
+      classification:
+        type: string
+        description: |-
+          The classification of the question.
+          - faq: The question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ).
+          - book_desk: The question is about booking a desk for team events.
+          - reject: The question is irrelevant.
+      other:
+        type: object
+        description: Additional information only if the classification is book_desk.
+        properties:
+          date:
+            type: string
+            description: The date for booking a desk in the format YYYY-MM-DD.
+          people:
+            type: integer
+            description: The number of people for booking a desk.
+    required: [classification]
+
+- id: faq
+  next: end
+  function: rag
+  function_params:
+    number_of_docs: 1
+    prompt: |-
+      You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
+      Question: {question}
+      Context: {context}
+      Answer:
+
+- id: end
+  function: end
+
+
+databases:
+  vector: null
+
+
+models:
+  llm:
+    api_key: "{{ llm_key }}"  # "{{ <secret> }}" references a secret by name
+    api_url: https://openai-devoteam.openai.azure.com/
+    api_version: "2024-10-21"  # Optional parameter
+    model: gpt-4o-mini
+  embeddings:
+    api_key: "{{ embeddings_key }}"
+    api_url: https://openai-devoteam.openai.azure.com/
+    api_version: "2024-10-21" # https://learn.microsoft.com/en-us/azure/ai-services/openai/api-version-deprecation#latest-ga-api-release
+    model: text-embedding-ada-002
+
+
+secrets:
+  hosts:  # Host names in [local, azure]
+  - name: local
+    vaults:
+    - name: null
+      secrets:
+      - name: llm_key  # Secret name in the application (unique)
+        value: LLM     # Secret name in the vault
+      - name: embeddings_key
+        value: EMBEDDINGS
+
+  # - name: azure
+  #   vaults:
+  #   - name: dvtm-gkenios-uva-dev-kv
+  #     secrets:
+  #     - name: llm_key  # Secret name in the application
+  #       value: LLM     # Secret name in the vault
+  #     - name: embeddings_key
+  #       value: EMBEDDINGS
+
+
+
+# - id: book_desk_confirmation
+#   function: defined_response
+#   prompt: null
+#   response: |-
+#     You want to book desks for {people} people on the {date}. Is that correct?
+
+#   book_desk_response:
+#     function: classify
+#     prompt: |-
+#       You have booked a desk for {people} people on the {date}. Enjoy your event!
+#     classes:
+#       book_desk: bool
+#     next_conditional:
+#       book_desk:
+#         true: book_desk
+#         false: start
+
+#   book_desk:
+#     function: api_call
+#     prompt: null
+#     response: |-
+#       I have booked a desk for {people} people on the {date}. Enjoy your event!

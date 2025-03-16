@@ -20,7 +20,9 @@ azure = [
     "azure-search-documents>=11.5.2",
 ]
 local = [
+    "chromadb>=0.6.3",
     "faiss-cpu>=1.10.0",
+    "langchain-chroma>=0.2.2",
 ]
 
 [dependency-groups]
@@ -49,3 +51,4 @@ convention = "google"
 # uv lock --upgrade
 # uv sync -U --all-groups
 # uv pip install -e .[azure,local]
+# chroma run --path ./.chromadb
