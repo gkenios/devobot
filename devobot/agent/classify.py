@@ -1,6 +1,8 @@
+from typing import Any
+
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from .common import NodeInteraction, NodeOutputType, State
+from .common import NodeInteraction, State
 from devobot.utils import format_prompt_with_context
 
 
@@ -8,9 +10,9 @@ async def classify(
     state: State,
     llm: BaseChatModel,
     prompt: str,
-    schema: dict,
+    schema: dict[str, Any],
     required: list[str],
-) -> NodeOutputType:
+) -> NodeInteraction:
     question = state.input
     formatted_prompt = format_prompt_with_context(prompt)
 
@@ -24,4 +26,4 @@ async def classify(
 
     structured_llm = llm.with_structured_output(json_schema)
     answer = await structured_llm.ainvoke(question)
-    return NodeInteraction(input=question, output=answer)
+    return NodeInteraction(input=question, output=answer)  # type: ignore

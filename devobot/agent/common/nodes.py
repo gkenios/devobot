@@ -8,10 +8,10 @@ from devobot.config import AgentNodeConfig
 def graph_node(
     func: NodeFunctionType,
     config: AgentNodeConfig,
-    **wrapper_kwargs: dict[str, Any],
+    **wrapper_kwargs: Any,
 ) -> NodeFunctionType:
-    async def wrapper(*args, **kwargs) -> NodeOutputType:
-        state: State = wrapper_kwargs.get("state")
+    async def wrapper(*args: Any, **kwargs: Any) -> NodeOutputType:
+        state: State = kwargs.get("state")  # type: ignore
         if not state:
             state = args[0]
 

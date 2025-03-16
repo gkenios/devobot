@@ -56,6 +56,6 @@ class SecretsConfig(BaseModel):
 # Yaml
 class YamlConfig(BaseModel):
     agent: list[AgentNodeConfig]
-    databases: dict
+    databases: dict[str, str | None]
     models: ModelsConfig
     secrets: SecretsConfig

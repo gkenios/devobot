@@ -58,7 +58,7 @@ class BaseEmbeddings(BaseModel, ABC):
 
 
 class AzureEmbeddings(BaseEmbeddings):
-    def auth(self) -> BaseChatModel:
+    def auth(self) -> Embeddings:
         return AzureOpenAIEmbeddings(
             azure_endpoint=self.api_url,
             azure_deployment=self.model,
@@ -72,7 +72,7 @@ def get_embeddings(
     api_key: SecretStr,
     api_url: str | None = None,
     api_version: str | None = None,
-) -> BaseChatModel:
+) -> Embeddings:
     if isinstance(api_url, str) and api_url.strip("/").endswith("azure.com"):
         llm_object = AzureEmbeddings
     # This is a placeholder for future LLM

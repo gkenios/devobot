@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+from langchain_core.embeddings.embeddings import Embeddings
+
 
 class VectorDB(ABC):
     def search(self, question: str, k: int = 3) -> list[str]:
@@ -15,11 +17,13 @@ class VectorDB(ABC):
     ) -> None:
         if isinstance(content, str):
             content = [content]
+        if isinstance(id, str):
             id = [id]
+        if isinstance(metadata, dict):
             metadata = [metadata]
         self._upsert(content, id, metadata)
 
-    def delete(self, id: str | list[str] | None, **kwargs) -> None:
+    def delete(self, id: str | list[str] | None, **kwargs: Any) -> None:
         if isinstance(id, str):
             id = [id]
         self._delete(id, **kwargs)
@@ -32,18 +36,18 @@ class VectorDB(ABC):
     def _upsert(
         self,
         content: list[str],
-        id: list[str],
-        metadata: list[dict[str, Any]],
+        id: list[str] | None,
+        metadata: list[dict[str, Any]] | None = None,
     ) -> None:
         pass
 
     @abstractmethod
-    def _delete(self, id: list[str], **kwargs) -> None:
+    def _delete(self, id: list[str] | None, **kwargs: Any) -> None:
         pass
 
 
 class ChromaVectorDB(VectorDB):
-    def __init__(self, collection_name, embeddings) -> None:
+    def __init__(self, collection_name: str, embeddings: Embeddings) -> None:
         from langchain_chroma import Chroma
 
         self.vector_store = Chroma(
@@ -61,7 +65,7 @@ class ChromaVectorDB(VectorDB):
     def _upsert(
         self,
         content: list[str],
-        id: list[str] | None = None,
+        id: list[str] | None,
         metadata: list[dict[str, Any]] | None = None,
     ) -> None:
         self.vector_store.add_texts(
@@ -69,7 +73,8 @@ class ChromaVectorDB(VectorDB):
             ids=id,
             metadatas=metadata,
         )
-    def _delete(self, id: list[str] | None, **kwargs) -> None:
+
+    def _delete(self, id: list[str] | None, **kwargs: Any) -> None:
         self.vector_store.delete(ids=id, **kwargs)
 
     def get(self, id: str) -> dict[str, Any]:

@@ -1,6 +1,7 @@
 from typing import Type
 
 from langgraph.graph import StateGraph, START, END
+from langgraph.graph.state import CompiledStateGraph
 
 from .create_nodes import AgentNodes
 from .yaml_processing import Config
@@ -22,7 +23,7 @@ def create_graph(
     state: Type[State],
     agent_nodes: dict[str, NodeFunctionType],
     agent_config: list[AgentNodeConfig],
-) -> None:
+) -> CompiledStateGraph:
     builder = StateGraph(state)
 
     for node_id, node in agent_nodes.items():

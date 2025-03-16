@@ -33,14 +33,13 @@ async def rag(
     retrieve = vector_db.search(question, k=number_of_docs)
     context = "\n\n".join(retrieve)
 
-    # TODO: Deal with State
     # Generate response
     formated_prompt = prompt.format(question=question, context=context)
     response = ""
     async for chunk in llm.astream(formated_prompt):
         # Yield each chunk as it arrives
-        yield NodeInteraction(input=question, output=chunk.content)
-        response += chunk.content
+        yield NodeInteraction(input=question, output=chunk.content)  # type: ignore
+        response += chunk.content  # type: ignore
 
     # Yield final response
     yield NodeInteraction(input=question, output=response)

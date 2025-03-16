@@ -10,7 +10,7 @@ def extra_context() -> dict[str, Any]:
     }
 
 
-def format_prompt(prompt: str, **kwargs) -> str:
+def format_prompt(prompt: str, **kwargs: str | Any) -> str:
     """Format the prompt with the given kwargs.
 
     Example:
