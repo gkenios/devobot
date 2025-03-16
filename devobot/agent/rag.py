@@ -8,6 +8,7 @@ async def rag(
     state: State,
     vector_db: VectorDB,
     llm: BaseChatModel,
+    # Config parameters
     prompt: str,
     number_of_docs: int = 3,
 ) -> NodeOutputType:

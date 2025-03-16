@@ -26,13 +26,14 @@ def create_graph(
 ) -> CompiledStateGraph:
     builder = StateGraph(state)
 
+    # Add nodes
     for node_id, node in agent_nodes.items():
         builder.add_node(node=node_id, action=node)
 
     for node in agent_config:
         current_node = get_node_name(node.id)
 
-        # If next is a string, convert to list
+        # If 'next' is a string, convert to list
         if isinstance(node.next, str):
             next_nodes = [node.next]
         elif isinstance(node.next, list):
@@ -40,7 +41,7 @@ def create_graph(
         else:
             next_nodes = []
 
-        # Add the edges
+        # Add edges
         for next_node in next_nodes:
             builder.add_edge(current_node, get_node_name(next_node))
 
@@ -60,8 +61,4 @@ def create_graph(
     return builder.compile()
 
 
-graph = create_graph(
-    state=State,
-    agent_nodes=AgentNodes,
-    agent_config=Config.config.agent,
-)
+graph = create_graph(State, AgentNodes, Config.config.agent)

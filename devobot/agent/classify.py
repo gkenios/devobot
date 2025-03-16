@@ -9,6 +9,7 @@ from devobot.utils import format_prompt_with_context
 async def classify(
     state: State,
     llm: BaseChatModel,
+    # Config parameters
     prompt: str,
     schema: dict[str, Any],
     required: list[str],
