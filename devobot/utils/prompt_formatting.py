@@ -3,16 +3,7 @@ from typing import Any
 
 
 def extra_context() -> dict[str, Any]:
-    """Extra context to be used in the prompt.
-
-    All the extra context can be used in the prompt as {key}.
-    Example:
-    - {today} will be replaced by the current date.
-    - {time} will be replaced by the current time.
-
-    Returns:
-        dict: The extra context.
-    """
+    """Extra information that can be help the agent get more context."""
     return {
         "today": date.today(),
         "time": datetime.now(),
