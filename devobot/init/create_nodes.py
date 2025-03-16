@@ -1,15 +1,15 @@
-from enum import Enum
 from typing import Callable
 
 from .yaml_processing import Config, embeddings, llm
-import agent
-from config import YamlConfig
-from services.database_vector import ChromaVectorDB
+import devobot.agent as agent
+from devobot.agent.common import NodeFunctionType, graph_node
+from devobot.config import AgentNodeConfig
+from devobot.services.database_vector import ChromaVectorDB
 
 
-def create_dynamic_nodes(config: YamlConfig) -> None:
+def create_dynamic_nodes(agent_config: list[AgentNodeConfig]) -> None:
     nodes = dict()
-    for node in config.agent:
+    for node in agent_config:
         if node.function.lower() in ["start", "end"]:
             continue
 
@@ -24,8 +24,10 @@ def create_dynamic_nodes(config: YamlConfig) -> None:
         if "llm" in func.__code__.co_varnames:
             func_params["llm"] = llm
 
-        nodes[node.id] = agent.graph_node(func, config=node, **func_params)
+        nodes[node.id] = graph_node(func, config=node, **func_params)
     return nodes
 
 
-AgentNode = Enum("AgentNode", create_dynamic_nodes(Config.config))  # type: ignore
+AgentNodes: dict[str, NodeFunctionType] = create_dynamic_nodes(
+    agent_config=Config.config.agent
+)

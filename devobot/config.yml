@@ -5,7 +5,8 @@ agent:
 
 - id: intent
   next_conditional:
-    classification:
+    key: classification
+    mapping:
       faq: faq
       book_desk: end
       reject: end
@@ -13,7 +14,7 @@ agent:
   function_params:
     prompt: |-
       Devoteam is an international consulting firm. Devoteam employees are going to ask you questions.
-      - If the question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ), respond with '{"intent": "faq", "other": null}'.
+      - If the question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ), respond with '{"classification": "faq", "other": null}'.
       - If the question is about booking a desk for team events, respond with '{"classification": "book_desk", "other": {"date": "YYYY-MM-DD", "people": <number of people>}}'.
       - If the question is irrelevant, respond with '{"classification": "reject", "other": null}'.
 

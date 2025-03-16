@@ -1,10 +1,9 @@
 import asyncio
 
-from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
 
 from devobot.agent import State
-from init.create_agent import AgentNode
+from devobot.init.create_graph import graph
 
 
 QUESTION = "What time can I park my car in the Devoteam office?"
@@ -12,7 +11,7 @@ QUESTION = "What time can I park my car in the Devoteam office?"
 
 async def main(graph: CompiledStateGraph):
     async for msg, _ in graph.astream(
-        input=State(lineage=[], input=QUESTION),
+        input=State(input=QUESTION, lineage=[]),
         stream_mode="messages",
     ):
         if msg.content:
@@ -21,17 +20,4 @@ async def main(graph: CompiledStateGraph):
 
 
 if __name__ == "__main__":
-    builder = StateGraph(State)
-
-    # Test One
-    builder.add_node(node="intent", action=getattr(AgentNode, "intent"))
-    builder.add_edge(START, "intent")
-    builder.add_edge("intent", END)
-
-    # Test Two
-    # builder.add_node(node="faq", action=getattr(AgentNode, "faq"))
-    # builder.add_edge(START, "faq")
-    # builder.add_edge("faq", END)
-
-    graph = builder.compile()
     asyncio.run(main(graph))

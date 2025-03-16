@@ -1,10 +1,9 @@
 from datetime import date, datetime
-from typing import AsyncGenerator
 
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from utils import format_prompt
-from ._common import NodeInteraction, State
+from .common import NodeInteraction, NodeOutputType, State
+from devobot.utils import format_prompt
 
 
 async def classify(
@@ -13,7 +12,7 @@ async def classify(
     prompt: str,
     schema: dict,
     required: list[str],
-) -> AsyncGenerator[NodeInteraction, None]:
+) -> NodeOutputType:
     question = state.input
 
     # Potentially relevant information

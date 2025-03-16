@@ -1,8 +1,7 @@
 from langchain_core.embeddings import Embeddings
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from config import CONFIG_FILE
-from config.yaml_schema import YamlConfig
+from devobot.config import CONFIG_FILE, YamlConfig
 from devobot.services import (
     Auth,
     AuthFactory,

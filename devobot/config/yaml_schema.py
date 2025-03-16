@@ -7,12 +7,17 @@ _SUPPORTED_CLOUD_PROVIDERS = ["azure", "gcp"]
 
 
 # Agent
+class NextConditional(BaseModel):
+    key: str
+    mapping: dict[str, str]
+
+
 class AgentNodeConfig(BaseModel):
     id: str
     function: str
     function_params: dict[str, Any] | None = None
     next: str | list[str] | None = None
-    next_conditional: dict[str, Any] | None = None
+    next_conditional: NextConditional | None = None
 
 
 # Models
