@@ -1,9 +1,7 @@
-from datetime import date, datetime
-
 from langchain_core.language_models.chat_models import BaseChatModel
 
 from .common import NodeInteraction, NodeOutputType, State
-from devobot.utils import format_prompt
+from devobot.utils import format_prompt_with_context
 
 
 async def classify(
@@ -14,11 +12,7 @@ async def classify(
     required: list[str],
 ) -> NodeOutputType:
     question = state.input
-
-    # Potentially relevant information
-    today = date.today()
-    time = datetime.now()
-    formatted_prompt = format_prompt(prompt, today=today, time=time)
+    formatted_prompt = format_prompt_with_context(prompt)
 
     json_schema = {
         "title": "Classify",
