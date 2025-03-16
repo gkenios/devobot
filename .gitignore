@@ -40,3 +40,6 @@ dmypy.json
 # Vector Databases
 .chromadb/
 chroma.log
+
+# Testing
+z.py
