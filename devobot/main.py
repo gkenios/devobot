@@ -6,7 +6,8 @@ from devobot.agent import State
 from devobot.init.create_graph import graph
 
 
-QUESTION = "What time can I park my car in the Devoteam office?"
+QUESTION = "How much does an ice cream cost in Greece?"
+USER_EMAIL = "georgios.gkenios@devoteam.com"
 
 
 async def main(state: State, graph: CompiledStateGraph) -> None:
@@ -17,5 +18,5 @@ async def main(state: State, graph: CompiledStateGraph) -> None:
 
 
 if __name__ == "__main__":
-    state = State(input=QUESTION, lineage=[])
+    state = State(input=QUESTION, user_email=USER_EMAIL, lineage=[])
     asyncio.run(main(state, graph))

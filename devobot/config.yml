@@ -8,18 +8,15 @@ agent:
     key: classification
     mapping:
       faq: faq
-      book_desk: end
-      reject: end
+      manage_desk_reservations: manage_desk_reservations
+      reject: reject
   function: classify
   function_params:
     prompt: |-
       Devoteam is an international consulting firm. Devoteam employees are going to ask you questions.
-      - If the question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ), respond with '{"classification": "faq", "other": null}'.
-      - If the question is about booking a desk for team events, respond with '{"classification": "book_desk", "other": {"date": "YYYY-MM-DD", "people": <number of people>}}'.
-      - If the question is irrelevant, respond with '{"classification": "reject", "other": null}'.
-
-      In the case of a question about booking a desk, make sure to get a confirmation from the user before booking the desk, including the information related to the date and amount of people. Also make sure that the date is either today or in the future.
-      For context, today's date is {today}.
+      - If the question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ), respond with '{"classification": "faq"}'.
+      - If the question is about managing desk reservations (make or delete desk reservations), respond with '{"classification": "manage_desk_reservations"}'.
+      - If the question is irrelevant, respond with '{"classification": "reject"}'.
     schema:
       classification:
         type: string
@@ -28,16 +25,6 @@ agent:
           - faq: The question is related to Devoteam, the office, parking or in general with any information that can be potentially be found in the company's Frequently Asked Questions (FAQ).
           - book_desk: The question is about booking a desk for team events.
           - reject: The question is irrelevant.
-      other:
-        type: object
-        description: Additional information only if the classification is book_desk.
-        properties:
-          date:
-            type: string
-            description: The date for booking a desk in the format YYYY-MM-DD.
-          people:
-            type: integer
-            description: The number of people for booking a desk.
     required: [classification]
 
 - id: faq
@@ -50,6 +37,29 @@ agent:
       Question: {question}
       Context: {context}
       Answer:
+
+- id: manage_desk_reservations
+  next: end
+  function: tool_call
+  function_params:
+    tools: [book_desk, unbook_desk]
+    tools_params:
+      book_desk:
+        client_id: "{{ joan_client_id }}"
+        client_secret: "{{ joan_client_secret }}"
+        company_id: "{{ joan_company_id }}"
+      unbook_desk:
+        client_id: "{{ joan_client_id }}"
+        client_secret: "{{ joan_client_secret }}"
+        company_id: "{{ joan_company_id }}"
+
+- id: reject
+  next: end
+  function: defined_answer
+  function_params:
+    answer: |-
+      I'm sorry. I cannot help you with that. I can help you with desk
+      management (book or unbook) or answer questions related to Devoteam FAQs.
 
 - id: end
   function: end
@@ -82,6 +92,12 @@ secrets:
         value: LLM     # Secret name in the vault
       - name: embeddings_key
         value: EMBEDDINGS
+      - name: joan_client_id
+        value: JOANID
+      - name: joan_client_secret
+        value: JOANSECRET
+      - name: joan_company_id
+        value: JOANCOMPANYID
 
   # - name: azure
   #   vaults:
@@ -91,28 +107,9 @@ secrets:
   #       value: LLM     # Secret name in the vault
   #     - name: embeddings_key
   #       value: EMBEDDINGS
-
-
-
-# - id: book_desk_confirmation
-#   function: defined_response
-#   prompt: null
-#   response: |-
-#     You want to book desks for {people} people on the {date}. Is that correct?
-
-#   book_desk_response:
-#     function: classify
-#     prompt: |-
-#       You have booked a desk for {people} people on the {date}. Enjoy your event!
-#     classes:
-#       book_desk: bool
-#     next_conditional:
-#       book_desk:
-#         true: book_desk
-#         false: start
-
-#   book_desk:
-#     function: api_call
-#     prompt: null
-#     response: |-
-#       I have booked a desk for {people} people on the {date}. Enjoy your event!
+  #     - name: joan_client_id
+  #       value: JOANID
+  #     - name: joan_client_secret
+  #       value: JOANSECRET
+  #     - name: joan_company_id
+  #       value: JOANCOMPANYID

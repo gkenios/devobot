@@ -24,12 +24,11 @@ def graph_node(
                 yield item
         else:
             awaited_result: NodeInteraction = await result
-
             # Update the lineage
             latest_update = NodeState(
-                config=config,
                 input=awaited_result.input,
                 output=awaited_result.output,
+                config=config,
             )
             state.lineage.append(latest_update)
 
