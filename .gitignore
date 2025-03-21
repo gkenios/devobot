@@ -24,7 +24,7 @@ coverage.xml
 cover/
 
 # UV
-#uv.lock
+uv.lock
 
 # Ruff
 .ruff_cache/

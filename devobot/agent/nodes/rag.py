@@ -1,6 +1,6 @@
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from .common import NodeInteraction, NodeOutputType, State
+from devobot.agent import NodeInteraction, NodeOutputType, State
 from devobot.services.database_vector import VectorDB
 
 

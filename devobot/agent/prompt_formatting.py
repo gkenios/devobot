@@ -7,6 +7,7 @@ def extra_context() -> dict[str, Any]:
     return {
         "today": date.today(),
         "time": datetime.now(),
+        "weekday": date.today().strftime("%A"),
     }
 
 

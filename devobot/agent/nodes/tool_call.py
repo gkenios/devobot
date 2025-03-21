@@ -3,13 +3,17 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.prompts import PromptTemplate
 
-from .common import NodeInteraction, State
+from devobot.agent import (
+    NodeInteraction,
+    NodeOutputType,
+    State,
+    format_prompt_with_context,
+)
 from devobot.agent import tools as custom_tools
-from devobot.utils import format_prompt_with_context
 
 
 DEFAULT_PROMPT = """Answer the following question using the available tools.
-For context, today's date is {today} and the current time is {time}.
+For context, today's date is {today}, {weekday}, and the current time is {time}.
 
 Question: {question}
 """
@@ -22,7 +26,7 @@ async def tool_call(
     tools: list[str],
     tools_params: dict[str, dict[str, str | int | float]] | None = None,
     prompt: str = DEFAULT_PROMPT,
-) -> NodeInteraction:
+) -> NodeOutputType:
     # Get the question from the state
     question = state.input
     prompt = format_prompt_with_context(prompt)

@@ -4,6 +4,7 @@ agent:
   function: start
 
 - id: intent
+  step_output: Identifing the next action  # To optionally output a step of your node
   next_conditional:
     key: classification
     mapping:
@@ -57,7 +58,7 @@ agent:
   next: end
   function: defined_answer
   function_params:
-    answer: |-
+    answer: >-
       I'm sorry. I cannot help you with that. I can help you with desk
       management (book or unbook) or answer questions related to Devoteam FAQs.
 

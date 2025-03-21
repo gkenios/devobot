@@ -2,8 +2,7 @@ from typing import Any
 
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from .common import NodeInteraction, State
-from devobot.utils import format_prompt_with_context
+from devobot.agent import NodeInteraction, State, format_prompt_with_context
 
 
 async def classify(

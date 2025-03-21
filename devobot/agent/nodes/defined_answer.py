@@ -1,4 +1,4 @@
-from .common import NodeInteraction, State
+from devobot.agent import NodeInteraction, State
 
 
 async def defined_answer(state: State, answer: str) -> NodeInteraction:
