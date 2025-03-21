@@ -41,6 +41,9 @@ def book_desk(
 
     for _ in range(people):
         seat_id = get_desk_slots(token, building_id, floor_id, date, desk_name)
+        if not seat_id:
+            return "No available desks for the given date."
+
         create_desk_reservation(token, company_id, user_id, seat_id, date)
     return f"Desk(s) booked for {people} people on {date}."
 
@@ -98,7 +101,7 @@ def get_location(
     company_id: str,
     city: str | None = None,
     floor: int | None = None,
-) -> dict:
+) -> tuple[str, str]:
     all_locations = get_locations(token, company_id)
     if city:
         city = city.lower()

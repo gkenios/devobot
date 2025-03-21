@@ -2,7 +2,7 @@ from dataclasses import asdict
 from typing import Any
 
 from .state import NodeInteraction, NodeState, State
-from .node_types import NodeFunctionType, NodeOutputType
+from .types import NodeFunctionType, NodeOutputType
 from devobot.config import AgentNodeConfig
 
 

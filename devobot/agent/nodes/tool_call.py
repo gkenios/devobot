@@ -45,6 +45,7 @@ async def tool_call(
     messages.append(result)
 
     # Invoke the tools
+    tools_params = tools_params or {}
     for tool_config in result.tool_calls:
         tool_name = tool_config["name"]
         args = tool_config["args"]

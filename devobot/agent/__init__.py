@@ -1,7 +1,7 @@
 from .node_wrapper import node_wrapper
 from .prompt_formatting import format_prompt_with_context
 from .state import State, NodeInteraction
-from .node_types import NodeFunctionType, NodeOutputType
+from .types import NodeFunctionType, NodeOutputType
 
 
 __all__ = [
