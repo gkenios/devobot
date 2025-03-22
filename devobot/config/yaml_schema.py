@@ -18,6 +18,7 @@ class AgentNodeConfig(BaseModel):
     function_params: dict[str, Any] | None = None
     next: str | list[str] | None = None
     next_conditional: NextConditional | None = None
+    step_output: str | None = None
 
 
 # Models

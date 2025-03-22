@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from typing import Any
 
 from .state import NodeInteraction, NodeState, State
@@ -5,7 +6,7 @@ from .types import NodeFunctionType, NodeOutputType
 from devobot.config import AgentNodeConfig
 
 
-def graph_node(
+def node_wrapper(
     func: NodeFunctionType,
     config: AgentNodeConfig,
     **wrapper_kwargs: Any,
@@ -24,16 +25,16 @@ def graph_node(
                 yield item
         else:
             awaited_result: NodeInteraction = await result
-
             # Update the lineage
             latest_update = NodeState(
-                config=config,
                 input=awaited_result.input,
                 output=awaited_result.output,
+                step_output=config.step_output,
             )
-            state.lineage.append(latest_update)
+            state.output = awaited_result.output
+            state.lineage.append(asdict(latest_update))
 
             # Yield final result
-            yield awaited_result
+            yield state
 
     return wrapper

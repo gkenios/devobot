@@ -5,7 +5,7 @@ from langgraph.graph.state import CompiledStateGraph
 
 from .create_nodes import AgentNodes
 from .yaml_processing import Config
-from devobot.agent.common import NodeFunctionType, State
+from devobot.agent import NodeFunctionType, State
 from devobot.config import AgentNodeConfig
 
 
@@ -19,7 +19,7 @@ def get_node_name(node_name: str) -> str:
     return node_name
 
 
-def create_graph(
+def create_dynamic_graph(
     state: Type[State],
     agent_nodes: dict[str, NodeFunctionType],
     agent_config: list[AgentNodeConfig],
@@ -55,10 +55,10 @@ def create_graph(
             }
             builder.add_conditional_edges(
                 source=current_node,
-                path=lambda state: state.lineage[-1].output[key],
+                path=lambda state: state.lineage[-1]["output"][key],
                 path_map=mapping,
             )
     return builder.compile()
 
 
-graph = create_graph(State, AgentNodes, Config.config.agent)
+graph = create_dynamic_graph(State, AgentNodes, Config.config.agent)

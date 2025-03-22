@@ -24,7 +24,7 @@ coverage.xml
 cover/
 
 # UV
-#uv.lock
+uv.lock
 
 # Ruff
 .ruff_cache/
@@ -40,3 +40,6 @@ dmypy.json
 # Vector Databases
 .chromadb/
 chroma.log
+
+# Testing
+z.py
