@@ -34,15 +34,22 @@ def book_desk(
     """
     token = get_token(client_id, client_secret)
     user_id, is_admin = get_user_id(token, company_id, user_email)
-    building_id, floor_id = get_location(token, company_id, city, floor)
-
+    if not user_id:
+        return "User not found."
     if not is_admin:
         people = 1
 
-    for _ in range(people):
-        seat_id = get_desk_slots(token, building_id, floor_id, date, desk_name)
+    building_id, floor_id = get_location(token, company_id, city, floor)
+    number_of_seats = get_number_of_free_seats(
+        token, building_id, floor_id, date, desk_name
+    )
+    if number_of_seats < people:
+        return f"You requested desks for {people} people, but only {number_of_seats} are available."
+
+    for i in range(people):
+        seat_id = get_seat_id(token, building_id, floor_id, date, desk_name)
         if not seat_id:
-            return "No available desks for the given date."
+            return f"While booking, someone else booked a desk and there are not enough desks. I booked {i} desks."
 
         create_desk_reservation(token, company_id, user_id, seat_id, date)
     return f"Desk(s) booked for {people} people on {date}."
@@ -68,6 +75,7 @@ def get_user_id(token: str, company_id: str, email: str) -> tuple[str, bool]:
             user_id = user["id"]
             is_admin = user["groups"] != ["portal_user"]
             return (user_id, is_admin)
+    return None, False
 
 
 def get_locations(token: str, company_id: str) -> list[dict]:
@@ -139,7 +147,39 @@ def create_desk_reservation(
     return response.json()
 
 
-def get_desk_slots(
+def get_number_of_free_seats(
+    token: str,
+    building_id: str,
+    floor_id: str,
+    date: str,
+    desk_name: str | None = None,
+    time_from: str = "09:00",
+    time_to: str = "17:00",
+) -> int:
+    response = requests.get(
+        "https://portal.getjoan.com/api/2.0/portal/desks/",
+        params={
+            "date": date,
+            "from": time_from,
+            "to": time_to,
+            "tz": "Europe/Amsterdam",
+            "building_id": building_id,
+            "floor_id": floor_id,
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    ).json()
+    results = response["results"]
+
+    # Only count the desks that match the desk_name
+    if desk_name:
+        desk_name = desk_name.lower()
+        results = [
+            desk for desk in results if desk_name in desk["name"].lower()
+        ]
+    return len(results)
+
+
+def get_seat_id(
     token: str,
     building_id: str,
     floor_id: str,

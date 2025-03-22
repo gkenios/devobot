@@ -19,6 +19,9 @@ def unbook_desk(
     """
     token = get_token(client_id, client_secret)
     user_id, _ = get_user_id(token, company_id, user_email)
+    if not user_id:
+        return "User not found."
+
     delete_desk_reservation(token, company_id, user_id, date)
     return f"Desk reservation(s) deleted for {date}."
 
@@ -43,6 +46,7 @@ def get_user_id(token: str, company_id: str, email: str) -> tuple[str, bool]:
             user_id = user["id"]
             is_admin = user["groups"] != ["portal_user"]
             return (user_id, is_admin)
+    return None, False
 
 
 def get_desk_reservation(
