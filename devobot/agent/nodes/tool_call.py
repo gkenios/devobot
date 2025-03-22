@@ -33,7 +33,14 @@ async def tool_call(
     messages = [HumanMessage(question)]
 
     # Get the tools
-    tools = [getattr(custom_tools, tool_name) for tool_name in tools]
+    tools = []
+    for tool_name in tools:
+        if hasattr(custom_tools, tool_name):
+            tools.append(getattr(custom_tools, tool_name))
+        else:
+            raise AttributeError(
+                f"Tool '{tool_name}' not found in the agent/tools directory."
+            )
 
     # Create the chain
     prompt = PromptTemplate(input_variables=["question"], template=prompt)
