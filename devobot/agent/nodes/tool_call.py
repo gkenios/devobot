@@ -33,10 +33,10 @@ async def tool_call(
     messages = [HumanMessage(question)]
 
     # Get the tools
-    tools = []
+    tool_funcs = []
     for tool_name in tools:
         if hasattr(custom_tools, tool_name):
-            tools.append(getattr(custom_tools, tool_name))
+            tool_funcs.append(getattr(custom_tools, tool_name))
         else:
             raise AttributeError(
                 f"Tool '{tool_name}' not found in the agent/tools directory."
@@ -44,7 +44,7 @@ async def tool_call(
 
     # Create the chain
     prompt = PromptTemplate(input_variables=["question"], template=prompt)
-    llm_with_tools = llm.bind_tools(tools)
+    llm_with_tools = llm.bind_tools(tool_funcs)
     chain: Chain = prompt | llm_with_tools
 
     # Invoke the chain
@@ -52,7 +52,6 @@ async def tool_call(
     messages.append(result)
 
     # Invoke the tools
-    tools_params = tools_params or {}
     for tool_config in result.tool_calls:
         tool_name = tool_config["name"]
         args = tool_config["args"]
