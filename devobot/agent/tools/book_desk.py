@@ -147,7 +147,7 @@ def get_desk_slots(
     desk_name: str | None = None,
     time_from: str = "09:00",
     time_to: str = "17:00",
-) -> dict:
+) -> str | None:
     response = requests.get(
         "https://portal.getjoan.com/api/2.0/portal/desks/",
         params={

@@ -4,7 +4,7 @@ agent:
   function: start
 
 - id: intent
-  step_output: Identifing the next action  # To optionally output a step of your node
+  step_output: Identifying the next action  # To optionally output a step of your node
   next_conditional:
     key: classification
     mapping:

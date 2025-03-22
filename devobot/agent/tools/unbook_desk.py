@@ -20,7 +20,7 @@ def unbook_desk(
     token = get_token(client_id, client_secret)
     user_id, _ = get_user_id(token, company_id, user_email)
     delete_desk_reservation(token, company_id, user_id, date)
-    return f"Desk reservation(s) deleted for on {date}."
+    return f"Desk reservation(s) deleted for {date}."
 
 
 # JOAN API functions
