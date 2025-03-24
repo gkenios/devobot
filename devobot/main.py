@@ -8,7 +8,7 @@ from devobot.init.create_graph import graph
 from devobot.init.create_nodes import end_nodes
 
 
-QUESTION = "What time can I park my car?"
+QUESTION = "Can you delete the desk reservation for next Sunday?"
 USER_EMAIL = "georgios.gkenios@devoteam.com"
 
 

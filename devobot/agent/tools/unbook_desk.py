@@ -1,16 +1,16 @@
-from typing import Annotated
-
-from langchain_core.tools import tool, InjectedToolArg
+from langchain_core.tools import tool
 import requests
+
+from agent.types import ConfigToolArg
 
 
 @tool
 def unbook_desk(
     date: str,
-    client_id: Annotated[str, InjectedToolArg],
-    client_secret: Annotated[str, InjectedToolArg],
-    company_id: Annotated[str, InjectedToolArg],
-    user_email: Annotated[str, InjectedToolArg],
+    client_id: ConfigToolArg[str],
+    client_secret: ConfigToolArg[str],
+    company_id: ConfigToolArg[str],
+    user_email: ConfigToolArg[str],
 ) -> str:
     """Deletes a desk reservation (or multiple) for a user on a given date.
 
