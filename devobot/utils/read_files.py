@@ -14,7 +14,7 @@ class File(ABC):
 class YamlFile(File):
     @classmethod
     def read_file(cls, path: str) -> Any:
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             content = yaml.safe_load(f)
         return content
 

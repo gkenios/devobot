@@ -8,7 +8,7 @@ from devobot.init.create_graph import graph
 from devobot.init.create_nodes import end_nodes
 
 
-QUESTION = "Can you delete the desk reservation for next Sunday?"
+QUESTION = "Can you help me with the parking hours at Devoteam?"
 USER_EMAIL = "georgios.gkenios@devoteam.com"
 
 
@@ -32,9 +32,8 @@ async def main(state: State, graph: CompiledStateGraph) -> None:
             node_name = next(iter(message))
             # Print the steps
             if node_name not in end_nodes:
-                step_output = message[node_name]["lineage"][-1]["step_output"]
-                if step_output:
-                    print(f"{STEP_SYMBOL} {step_output}")
+                if step_msg := message[node_name]["lineage"][-1]["step_output"]:
+                    print(f"{STEP_SYMBOL} {step_msg}")
             # Print the final message if it is not streaming
             elif not last_answer_is_streaming:
                 print(message[node_name]["output"])

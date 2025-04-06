@@ -1,17 +1,27 @@
 from devobot.services.database_vector import ChromaVectorDB
 from devobot.init.yaml_processing import embeddings
+from devobot.utils import read_file
 
 
-page_content = "Parking is open at the Devoteam office from 08:00 to 21:00. Please visit our interanet to book a parking space."
-metadata = {"title": "Parking"}
-id = "Parking"
-
-
+faq = read_file("faq.yml")
 vector_db = ChromaVectorDB("faq", embeddings)
 vector_store = vector_db.vector_store
-vector_db.upsert(page_content, id, metadata)
-results = vector_db.get("Parking")
-print(results)
 
-d = vector_store.search("book a parking space", "similarity", k=3)
-print(d)
+for document in faq:
+    id = document["title"]
+    page_content = (
+        f"Source: {document['source']}\n"
+        f"Title: {document['title']}\n"
+        f"Question: {document['question']}\n"
+        f"Answer: {document['answer']}"
+    )
+    metadata = {
+        "title": document["title"],
+        "category": document["category"],
+        "source": document["source"],
+        "question": document["question"],
+    }
+    vector_db.upsert(page_content, id, metadata)
+
+search = vector_store.search("Parking", "similarity", k=3)
+print(search)
