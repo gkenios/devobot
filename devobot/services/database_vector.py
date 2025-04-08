@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import Any
 
 from langchain_core.embeddings.embeddings import Embeddings
@@ -47,13 +48,18 @@ class VectorDB(ABC):
 
 
 class ChromaVectorDB(VectorDB):
-    def __init__(self, collection_name: str, embeddings: Embeddings) -> None:
+    def __init__(
+        self,
+        embeddings: Embeddings,
+        collection: str,
+        endpoint: str,
+    ) -> None:
         from langchain_chroma import Chroma
 
         self.vector_store = Chroma(
-            collection_name=collection_name,
             embedding_function=embeddings,
-            persist_directory="./.chromadb",
+            persist_directory=endpoint,
+            collection_name=collection,
         )
 
     def _search(self, question: str, method: str, k: int = 3) -> list[str]:
@@ -88,3 +94,13 @@ class ChromaVectorDB(VectorDB):
 
 class AzureVectorDB(VectorDB):
     pass
+
+
+class GCPVectorDB(VectorDB):
+    pass
+
+
+class VectorDBFactory(Enum):
+    local = ChromaVectorDB
+    azure = AzureVectorDB
+    gcp = GCPVectorDB

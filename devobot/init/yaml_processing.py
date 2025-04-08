@@ -6,6 +6,8 @@ from devobot.services import (
     Auth,
     AuthFactory,
     SecretFactory,
+    VectorDB,
+    VectorDBFactory,
     get_embeddings,
     get_llm,
 )
@@ -20,6 +22,7 @@ class ConfigSingleton(metaclass=Singleton):
         self.auth: dict[str, Auth] = dict()
         self.secrets: dict[str, str] = dict()
         self.models: dict[str, BaseChatModel | Embeddings] = dict()
+        self.databases: dict[str, VectorDB] = dict()
 
         self.build_auth()
         self.get_secrets()
@@ -35,6 +38,18 @@ class ConfigSingleton(metaclass=Singleton):
         self.models["embeddings"] = get_embeddings(
             **models_conf.embeddings.__dict__
         )
+
+    def get_databases(self) -> None:
+        db = self.config.databases
+        if db.vector:
+            vector_db = VectorDBFactory[db.vector.host].value(
+                embeddings=self.models["embeddings"],
+                endpoint=db.vector.endpoint,
+                collection=db.vector.collection,
+            )
+            self.databases["vector"] = vector_db
+        if db.nosql:
+            pass
 
     def get_secrets(self) -> None:
         # Iterate over hosts
@@ -66,3 +81,4 @@ class ConfigSingleton(metaclass=Singleton):
 Config = ConfigSingleton()
 llm = Config.models["llm"]
 embeddings = Config.models["embeddings"]
+vector_db = Config.databases["vector"]

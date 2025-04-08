@@ -67,7 +67,10 @@ agent:
 
 
 databases:
-  vector: null
+  vector:
+    host: local
+    endpoint: ./.chromadb
+    collection: faq
 
 
 models:

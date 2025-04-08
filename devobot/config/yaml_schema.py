@@ -21,6 +21,18 @@ class AgentNodeConfig(BaseModel):
     step_output: str | None = None
 
 
+# Database
+class DatabaseConfig(BaseModel):
+    host: Literal["local", "azure"]
+    endpoint: str | None = None
+    collection: str | None = None
+
+
+class DatabaseTypeConfig(BaseModel):
+    vector: DatabaseConfig | None = None
+    nosql: DatabaseConfig | None = None
+
+
 # Models
 class ModelConfig(BaseModel):
     api_key: str
@@ -57,6 +69,6 @@ class SecretsConfig(BaseModel):
 # Yaml
 class YamlConfig(BaseModel):
     agent: list[AgentNodeConfig]
-    databases: dict[str, str | None]
+    databases: DatabaseTypeConfig
     models: ModelsConfig
     secrets: SecretsConfig
