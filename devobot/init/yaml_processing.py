@@ -27,6 +27,7 @@ class ConfigSingleton(metaclass=Singleton):
         self.build_auth()
         self.get_secrets()
         self.get_models()
+        self.get_databases()
 
     def build_auth(self) -> None:
         for host in self.config.secrets.hosts:
