@@ -15,6 +15,6 @@ An agentic chatbot that can access Devoteam's FAQs.
 ## To Do
 - [x] Gather the FAQ
 - [x] Store the FAQ in the Vector DB
-- [ ] Write the (abstract + concreate) code to read and write to a Vector DB
+- [x] Write the (abstract + concreate) code to read and write to a Vector DB
 - [ ] Create the API and Endpoints
 - [ ] Develop features to read chat history in different ways (all, last N messages, summarize)
